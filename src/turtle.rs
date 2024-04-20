@@ -1,6 +1,5 @@
-use std::f64::consts::PI;
-
 use crate::draw::*;
+use crate::units::{Angle, Distance, Pt};
 
 pub type Thickness = f64;
 
@@ -15,8 +14,8 @@ pub enum Step {
     Move(Distance),
     Turn(Angle),
     PenDown(Style),
-    Pivot { distance: Distance, arc: Angle },
     PenUp,
+    Pivot { distance: Distance, arc: Angle },
     Repeat { count: u8, steps: Vec<Step> },
 }
 
@@ -28,22 +27,22 @@ pub struct Turtle {
 
 impl Turtle {
     fn turn(&mut self, theta: Angle) {
-        self.head = (self.head + theta) % (2.0 * PI);
+        self.head = self.head.add(theta);
     }
 
     fn advance(&mut self, d: Distance) {
         self.position = (
-            self.position.0 + d * f64::cos(self.head),
-            self.position.1 + d * f64::sin(self.head),
+            self.position.0 + d * self.head.cos(),
+            self.position.1 + d * self.head.sin(),
         );
     }
 
     fn pivot(&mut self, r: Distance, arc: Angle) {
-        let head = self.head - PI / 2.0;
+        let old_head = self.head.subtract(Angle::quarter_turn());
         self.turn(arc);
-        let new_head = self.head - PI / 2.0;
-        let x = -r * f64::cos(head) + r * f64::cos(new_head);
-        let y = -r * f64::sin(head) + r * f64::sin(new_head);
+        let new_head = self.head.subtract(Angle::quarter_turn());
+        let x = old_head.cos_r(-r) + new_head.cos_r(r);
+        let y = old_head.sin_r(-r) + new_head.sin_r(r);
         self.position = (self.position.0 + x, self.position.1 + y);
     }
 }
@@ -93,11 +92,13 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
             Step::Pivot { distance, arc } => {
                 if let Some(ref mut p) = path {
                     p.1.arc(
-                        turtle.position.0 - distance * f64::cos(turtle.head - PI / 2.0),
-                        turtle.position.1 - distance * f64::sin(turtle.head - PI / 2.0),
+                        turtle.position.0
+                            - turtle.head.subtract(Angle::quarter_turn()).cos_r(*distance),
+                        turtle.position.1
+                            - turtle.head.subtract(Angle::quarter_turn()).sin_r(*distance),
                         distance.clone(),
-                        turtle.head - PI / 2.0,
-                        turtle.head + arc - PI / 2.0,
+                        turtle.head.subtract(Angle::quarter_turn()),
+                        turtle.head.add(*arc).subtract(Angle::quarter_turn()),
                     )
                 }
                 turtle.pivot(*distance, *arc);

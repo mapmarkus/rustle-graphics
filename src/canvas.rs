@@ -4,6 +4,7 @@ use wasm_bindgen::prelude::{JsCast, JsValue};
 use web_sys::{console, CanvasRenderingContext2d, Path2d};
 
 use crate::turtle::Turtle;
+use crate::units::{Angle, Distance, Units};
 use crate::{draw::*, Style};
 
 impl Drawable for Draw<Path2d> {
@@ -16,7 +17,9 @@ impl Drawable for Draw<Path2d> {
     }
 
     fn arc(&mut self, x: Units, y: Units, radius: Distance, start_angle: Angle, end_angle: Angle) {
-        self.path.arc(x, y, radius, start_angle, end_angle).unwrap();
+        self.path
+            .arc(x, y, radius, start_angle.value(), end_angle.value())
+            .unwrap();
     }
 }
 
@@ -83,8 +86,8 @@ pub fn draw_turtle_head(turtle: &Turtle, context: &CanvasRenderingContext2d) {
     context.set_stroke_style(&"black".into());
     context.move_to(turtle.position.0, turtle.position.1);
     context.line_to(
-        turtle.position.0 + 6.0 * f64::cos(turtle.head),
-        turtle.position.1 + 6.0 * f64::sin(turtle.head),
+        turtle.position.0 + turtle.head.cos_r(6.0),
+        turtle.position.1 + turtle.head.sin_r(6.0),
     );
     context.stroke();
 }

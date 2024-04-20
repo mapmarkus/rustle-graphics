@@ -6,10 +6,12 @@ use web_sys::Path2d;
 mod canvas;
 mod draw;
 pub mod turtle;
+mod units;
 
 use canvas::{draw_turtle_head, draw_turtle_trails, get_context};
 use draw::Draw;
 use turtle::*;
+use units::Angle;
 
 // WASM STUFF
 
@@ -18,7 +20,7 @@ pub fn start() -> Result<(), JsValue> {
     let context = get_context()?;
 
     let mut turtle = Turtle {
-        head: 0.0,
+        head: Angle::new(0.0),
         position: (250.0, 150.0),
     };
 
@@ -38,19 +40,19 @@ pub fn start() -> Result<(), JsValue> {
         // Step::Move(10.0),
         Step::Pivot {
             distance: 50.0,
-            arc: PI / 3.0,
+            arc: Angle::new(PI / 3.0),
         },
         Step::PenDown(blue.clone()),
         // Step::Move(10.0),
         Step::Pivot {
             distance: 50.0,
-            arc: PI / 3.0,
+            arc: Angle::new(PI / 3.0),
         },
-        Step::Turn(PI / 2.0),
+        Step::Turn(Angle::quarter_turn()),
         Step::Move(50.0),
         Step::PenUp,
         Step::Move(-50.0),
-        Step::Turn(-PI / 2.0),
+        Step::Turn(Angle::quarter_turn().negate()),
     ];
 
     let _steps2 = vec![
@@ -58,17 +60,17 @@ pub fn start() -> Result<(), JsValue> {
             color: "red".to_string(),
             width: 1.0,
         }),
-        Step::Turn(2.0 * PI / 3.0),
+        Step::Turn(Angle::new(2.0 * PI / 3.0)),
         Step::Move(100.0),
         Step::PenDown(Style {
             color: "blue".to_string(),
             width: 1.0,
         }),
-        Step::Turn(2.0 * PI / 3.0),
+        Step::Turn(Angle::new(2.0 * PI / 3.0)),
         Step::Move(100.0),
         Step::Pivot {
             distance: 50.0,
-            arc: PI / 2.0,
+            arc: Angle::quarter_turn(),
         },
         Step::PenUp,
         Step::Move(100.0),
@@ -78,14 +80,14 @@ pub fn start() -> Result<(), JsValue> {
         }),
         Step::Repeat {
             count: 5,
-            steps: [Step::Turn(PI / 6.0), Step::Move(100.0)].to_vec(),
+            steps: [Step::Turn(Angle::new(PI / 6.0)), Step::Move(100.0)].to_vec(),
         },
         Step::PenUp,
         Step::PenDown(Style {
             color: "yellow".to_string(),
             width: 1.0,
         }),
-        Step::Turn(2.0 * PI / 3.0),
+        Step::Turn(Angle::new(2.0 * PI / 3.0)),
         Step::Move(100.0),
     ];
 
@@ -96,11 +98,11 @@ pub fn start() -> Result<(), JsValue> {
         }),
         Step::Pivot {
             distance: 50.0,
-            arc: PI / 3.0,
+            arc: Angle::new(PI / 3.0),
         },
         Step::Pivot {
             distance: 50.0,
-            arc: PI / 3.0,
+            arc: Angle::new(PI / 3.0),
         },
     ];
 
@@ -110,10 +112,10 @@ pub fn start() -> Result<(), JsValue> {
             count: 12,
             steps: vec![
                 Step::Move(20.0),
-                Step::Turn(PI / 3.0),
+                Step::Turn(Angle::new(PI / 3.0)),
                 Step::Repeat {
                     count: 9,
-                    steps: vec![Step::Move(20.0), Step::Turn(PI / 6.0)],
+                    steps: vec![Step::Move(20.0), Step::Turn(Angle::new(PI / 6.0))],
                 },
             ],
         },

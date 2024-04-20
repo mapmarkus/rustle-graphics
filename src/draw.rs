@@ -1,10 +1,4 @@
-pub type Units = f64;
-
-pub type Pt = (Units, Units);
-
-pub type Distance = Units;
-
-pub type Angle = Units;
+use crate::units::{Angle, Distance, Units};
 
 pub struct Draw<T> {
     pub path: T,
