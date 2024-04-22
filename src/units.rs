@@ -6,6 +6,8 @@ pub type Pt = (Units, Units);
 
 pub type Distance = Units;
 
+pub type Thickness = f64;
+
 #[derive(Copy, Clone, Debug)]
 pub struct Angle(Units);
 

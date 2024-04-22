@@ -1,7 +1,5 @@
 use crate::draw::*;
-use crate::units::{Angle, Distance, Pt};
-
-pub type Thickness = f64;
+use crate::units::*;
 
 #[derive(Clone, Debug)]
 pub struct Style {
@@ -37,13 +35,8 @@ impl Turtle {
         );
     }
 
-    fn pivot(&mut self, r: Distance, arc: Angle) {
-        let old_head = self.head.subtract(Angle::quarter_turn());
-        self.turn(arc);
-        let new_head = self.head.subtract(Angle::quarter_turn());
-        let x = old_head.cos_r(-r) + new_head.cos_r(r);
-        let y = old_head.sin_r(-r) + new_head.sin_r(r);
-        self.position = (self.position.0 + x, self.position.1 + y);
+    fn teleport(&mut self, pt: Pt) {
+        self.position = pt;
     }
 }
 
@@ -91,17 +84,38 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
             }
             Step::Pivot { distance, arc } => {
                 if let Some(ref mut p) = path {
-                    p.1.arc(
-                        turtle.position.0
-                            - turtle.head.subtract(Angle::quarter_turn()).cos_r(*distance),
-                        turtle.position.1
-                            - turtle.head.subtract(Angle::quarter_turn()).sin_r(*distance),
-                        distance.clone(),
-                        turtle.head.subtract(Angle::quarter_turn()),
-                        turtle.head.add(*arc).subtract(Angle::quarter_turn()),
-                    )
+                    // Subtracting or adding PI/2 is necessary to account for the fact that we want the turtle to be tangent to the "pivot arc"
+                    // If we don't do it, the turtle will be facing outward (normal) to the pivot circle, and that would not achieve
+                    // the smooth effect of a turtle pivoting around a point.
+                    let tangent_head = if arc.value() > 0.0 {
+                        turtle.head.subtract(Angle::quarter_turn())
+                    } else {
+                        turtle.head.add(Angle::quarter_turn())
+                    };
+
+                    let dest_angle = tangent_head.add(*arc);
+                    let pivot_x = turtle.position.0 - tangent_head.cos_r(*distance);
+                    let pivot_y = turtle.position.1 - tangent_head.sin_r(*distance);
+                    let x = pivot_x + dest_angle.cos_r(*distance);
+                    let y = pivot_y + dest_angle.sin_r(*distance);
+
+                    if arc.value() > 0.0 {
+                        p.1.arc(
+                            pivot_x,
+                            pivot_y,
+                            *distance,
+                            tangent_head,
+                            tangent_head.add(*arc),
+                        )
+                    } else {
+                        p.1.move_to(x, y);
+                        p.1.arc(pivot_x, pivot_y, *distance, dest_angle, tangent_head);
+                        p.1.move_to(x, y);
+                    }
+
+                    turtle.turn(*arc);
+                    turtle.teleport((x, y));
                 }
-                turtle.pivot(*distance, *arc);
             }
             Step::PenUp => {
                 if path.is_some() {

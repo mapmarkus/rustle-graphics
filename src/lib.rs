@@ -96,17 +96,30 @@ pub fn start() -> Result<(), JsValue> {
             color: "red".to_string(),
             width: 1.0,
         }),
-        Step::Pivot {
-            distance: 50.0,
-            arc: Angle::new(PI / 3.0),
-        },
-        Step::Pivot {
-            distance: 50.0,
-            arc: Angle::new(PI / 3.0),
+        Step::Repeat {
+            count: 4,
+            steps: vec![
+                Step::Pivot {
+                    distance: 20.0,
+                    arc: Angle::new(PI / 3.0),
+                },
+                Step::Pivot {
+                    distance: 20.0,
+                    arc: Angle::new(-PI / 3.0),
+                },
+                Step::Pivot {
+                    distance: 20.0,
+                    arc: Angle::new(PI / 2.0),
+                },
+                Step::Pivot {
+                    distance: 20.0,
+                    arc: Angle::new(-PI),
+                },
+            ],
         },
     ];
 
-    let flower = vec![
+    let _flower = vec![
         Step::PenDown(red.clone()),
         Step::Repeat {
             count: 12,
@@ -121,7 +134,7 @@ pub fn start() -> Result<(), JsValue> {
         },
     ];
 
-    let trails: Vec<(Style, Draw<Path2d>)> = draw_turtle(&mut turtle, &flower);
+    let trails: Vec<(Style, Draw<Path2d>)> = draw_turtle(&mut turtle, &_steps3);
 
     draw_turtle_trails(&trails, &context);
     draw_turtle_head(&turtle, &context);
