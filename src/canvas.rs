@@ -1,10 +1,8 @@
-use std::f64::consts::PI;
-
 use wasm_bindgen::prelude::{JsCast, JsValue};
 use web_sys::{console, CanvasRenderingContext2d, Path2d};
 
 use crate::turtle::Turtle;
-use crate::units::{Angle, Distance, Units};
+use crate::units::Angle;
 use crate::{draw::*, Style};
 
 impl Drawable for Draw<Path2d> {
@@ -16,9 +14,9 @@ impl Drawable for Draw<Path2d> {
         self.path.line_to(x, y);
     }
 
-    fn arc(&mut self, x: Units, y: Units, radius: Distance, start_angle: Angle, end_angle: Angle) {
+    fn arc(&mut self, center_x: f64, center_y: f64, radius: f64, start_angle: f64, end_angle: f64) {
         self.path
-            .arc(x, y, radius, start_angle.value(), end_angle.value())
+            .arc(center_x, center_y, radius, start_angle, end_angle)
             .unwrap();
     }
 }
@@ -77,7 +75,7 @@ pub fn draw_turtle_head(turtle: &Turtle, context: &CanvasRenderingContext2d) {
             3.0,
             0.0,
             0.0,
-            2.0 * PI,
+            Angle::turn().value(),
         )
         .unwrap();
     context.set_fill_style(&"black".into());

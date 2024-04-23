@@ -9,7 +9,7 @@ pub struct Style {
 
 #[derive(Clone, Debug)]
 pub enum Step {
-    Move(Distance),
+    Go(Distance),
     Turn(Angle),
     PenDown(Style),
     PenUp,
@@ -28,7 +28,7 @@ impl Turtle {
         self.head = self.head.add(theta);
     }
 
-    fn advance(&mut self, d: Distance) {
+    fn go(&mut self, d: Distance) {
         self.position = (
             self.position.0 + d * self.head.cos(),
             self.position.1 + d * self.head.sin(),
@@ -68,8 +68,8 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
                 new_p.move_to(turtle.position.0, turtle.position.1);
                 *path = Some((s.clone(), new_p));
             }
-            Step::Move(d) => {
-                turtle.advance(*d);
+            Step::Go(d) => {
+                turtle.go(*d);
                 // console::log_1(
                 //     &format!("Move. Line to {} {}", turtle.position.0, turtle.position.1).into(),
                 // );
@@ -104,12 +104,18 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
                             pivot_x,
                             pivot_y,
                             *distance,
-                            tangent_head,
-                            tangent_head.add(*arc),
+                            tangent_head.value(),
+                            tangent_head.add(*arc).value(),
                         )
                     } else {
                         p.1.move_to(x, y);
-                        p.1.arc(pivot_x, pivot_y, *distance, dest_angle, tangent_head);
+                        p.1.arc(
+                            pivot_x,
+                            pivot_y,
+                            *distance,
+                            dest_angle.value(),
+                            tangent_head.value(),
+                        );
                         p.1.move_to(x, y);
                     }
 

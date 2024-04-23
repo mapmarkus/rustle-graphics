@@ -1,19 +1,33 @@
 use std::f64::consts::PI;
 
+const TWO_PI: f64 = 2.0 * PI;
+
+const HALF_PI: f64 = PI / 2.0;
+
 pub type Units = f64;
 
 pub type Pt = (Units, Units);
 
 pub type Distance = Units;
 
-pub type Thickness = f64;
+pub type Thickness = Units;
 
+/// Angle "turn" representation.
+///
+/// Its interval is [-2*PI, 2*PI]. Angles that fall outside of the range are normalised.
+///
+/// NOTE: +/- 2*PI is not normalised.
+///
 #[derive(Copy, Clone, Debug)]
 pub struct Angle(Units);
 
 impl Angle {
     pub fn new(value: Units) -> Self {
-        Angle(value % (2.0 * PI))
+        if value.abs() > TWO_PI {
+            Angle(value % TWO_PI)
+        } else {
+            Angle(value)
+        }
     }
 
     pub fn negate(&self) -> Self {
@@ -29,7 +43,7 @@ impl Angle {
     }
 
     pub fn cos(&self) -> Units {
-        f64::cos(self.0)
+        Units::cos(self.0)
     }
 
     pub fn cos_r(&self, r: Units) -> Units {
@@ -37,7 +51,7 @@ impl Angle {
     }
 
     pub fn sin(&self) -> Units {
-        f64::sin(self.0)
+        Units::sin(self.0)
     }
 
     pub fn sin_r(&self, r: Units) -> Units {
@@ -49,7 +63,7 @@ impl Angle {
     }
 
     pub fn turn() -> Self {
-        Angle::new(2.0 * PI)
+        Angle::new(TWO_PI)
     }
 
     pub fn half_turn() -> Self {
@@ -57,6 +71,6 @@ impl Angle {
     }
 
     pub fn quarter_turn() -> Self {
-        Angle::new(PI / 2.0)
+        Angle::new(HALF_PI)
     }
 }

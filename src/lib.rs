@@ -49,9 +49,9 @@ pub fn start() -> Result<(), JsValue> {
             arc: Angle::new(PI / 3.0),
         },
         Step::Turn(Angle::quarter_turn()),
-        Step::Move(50.0),
+        Step::Go(50.0),
         Step::PenUp,
-        Step::Move(-50.0),
+        Step::Go(-50.0),
         Step::Turn(Angle::quarter_turn().negate()),
     ];
 
@@ -61,26 +61,26 @@ pub fn start() -> Result<(), JsValue> {
             width: 1.0,
         }),
         Step::Turn(Angle::new(2.0 * PI / 3.0)),
-        Step::Move(100.0),
+        Step::Go(100.0),
         Step::PenDown(Style {
             color: "blue".to_string(),
             width: 1.0,
         }),
         Step::Turn(Angle::new(2.0 * PI / 3.0)),
-        Step::Move(100.0),
+        Step::Go(100.0),
         Step::Pivot {
             distance: 50.0,
             arc: Angle::quarter_turn(),
         },
         Step::PenUp,
-        Step::Move(100.0),
+        Step::Go(100.0),
         Step::PenDown(Style {
             color: "green".to_string(),
             width: 1.0,
         }),
         Step::Repeat {
             count: 5,
-            steps: [Step::Turn(Angle::new(PI / 6.0)), Step::Move(100.0)].to_vec(),
+            steps: [Step::Turn(Angle::new(PI / 6.0)), Step::Go(100.0)].to_vec(),
         },
         Step::PenUp,
         Step::PenDown(Style {
@@ -88,7 +88,7 @@ pub fn start() -> Result<(), JsValue> {
             width: 1.0,
         }),
         Step::Turn(Angle::new(2.0 * PI / 3.0)),
-        Step::Move(100.0),
+        Step::Go(100.0),
     ];
 
     let _steps3 = vec![
@@ -124,11 +124,11 @@ pub fn start() -> Result<(), JsValue> {
         Step::Repeat {
             count: 12,
             steps: vec![
-                Step::Move(20.0),
+                Step::Go(20.0),
                 Step::Turn(Angle::new(PI / 3.0)),
                 Step::Repeat {
                     count: 9,
-                    steps: vec![Step::Move(20.0), Step::Turn(Angle::new(PI / 6.0))],
+                    steps: vec![Step::Go(20.0), Step::Turn(Angle::new(PI / 6.0))],
                 },
             ],
         },
