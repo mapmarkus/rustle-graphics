@@ -14,7 +14,8 @@ pub enum Step {
     PenDown(Style),
     PenUp,
     Pivot { distance: Distance, arc: Angle },
-    Repeat { count: u8, steps: Vec<Step> },
+    Repeat { count: u8, step: Box<Step> },
+    Perform { steps: Vec<Step> },
 }
 
 #[derive(Clone, Debug)]
@@ -130,9 +131,13 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
                 }
                 *path = None;
             }
-            Step::Repeat { count, steps } => {
+            Step::Perform { steps } => {
+                draw_turtle_in_drawable(turtle, steps, path, trails);
+            }
+            Step::Repeat { count, step } => {
+                let unboxed_step = (*step).as_ref();
                 for _ in 0..*count {
-                    draw_turtle_in_drawable(turtle, steps, path, trails);
+                    draw_turtle_in_drawable(turtle, &[unboxed_step.clone()], path, trails);
                 }
             }
         }
