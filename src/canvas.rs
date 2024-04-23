@@ -1,9 +1,9 @@
 use wasm_bindgen::prelude::{JsCast, JsValue};
 use web_sys::{console, CanvasRenderingContext2d, Path2d};
 
-use crate::turtle::Turtle;
-use crate::units::Angle;
-use crate::{draw::*, Style};
+// use crate::units::Angle;
+use crate::draw::*;
+use crate::turtle::Trail;
 
 impl Drawable for Draw<Path2d> {
     fn move_to(&mut self, x: f64, y: f64) {
@@ -54,38 +54,35 @@ pub fn _test(context: &CanvasRenderingContext2d) {
     context.fill_with_path_2d(&path);
 }
 
-pub fn draw_turtle_trails(trails: &Vec<(Style, Draw<Path2d>)>, context: &CanvasRenderingContext2d) {
-    for (style, draw) in trails {
+pub fn draw_turtle_trails(trails: &Vec<Trail<Draw<Path2d>>>, context: &CanvasRenderingContext2d) {
+    for Trail { style, trail } in trails {
         context.set_stroke_style(&style.color.clone().into());
         context.set_line_width(style.width);
-        // context.rect(10.0, 10.0, 100.0, 100.0);
-        // context.stroke();
-        context.stroke_with_path(&draw.path);
+        context.stroke_with_path(&trail.path);
     }
-    // console::log_1(&format!("Trails {}", trails.len()).into());
 }
 
-pub fn draw_turtle_head(turtle: &Turtle, context: &CanvasRenderingContext2d) {
-    context.begin_path();
-    context
-        .ellipse(
-            turtle.position.0,
-            turtle.position.1,
-            3.0,
-            3.0,
-            0.0,
-            0.0,
-            Angle::turn().value(),
-        )
-        .unwrap();
-    context.set_fill_style(&"black".into());
-    context.fill();
-    context.begin_path();
-    context.set_stroke_style(&"black".into());
-    context.move_to(turtle.position.0, turtle.position.1);
-    context.line_to(
-        turtle.position.0 + turtle.head.cos_r(6.0),
-        turtle.position.1 + turtle.head.sin_r(6.0),
-    );
-    context.stroke();
-}
+// pub fn draw_turtle_head(turtle: &Turtle, context: &CanvasRenderingContext2d) {
+//     context.begin_path();
+//     context
+//         .ellipse(
+//             turtle.position.0,
+//             turtle.position.1,
+//             3.0,
+//             3.0,
+//             0.0,
+//             0.0,
+//             Angle::turn().value(),
+//         )
+//         .unwrap();
+//     context.set_fill_style(&"black".into());
+//     context.fill();
+//     context.begin_path();
+//     context.set_stroke_style(&"black".into());
+//     context.move_to(turtle.position.0, turtle.position.1);
+//     context.line_to(
+//         turtle.position.0 + turtle.heading.cos_r(6.0),
+//         turtle.position.1 + turtle.heading.sin_r(6.0),
+//     );
+//     context.stroke();
+// }

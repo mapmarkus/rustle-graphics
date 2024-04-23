@@ -73,4 +73,8 @@ impl Angle {
     pub fn quarter_turn() -> Self {
         Angle::new(HALF_PI)
     }
+
+    pub fn zero() -> Self {
+        Angle::new(0.0)
+    }
 }

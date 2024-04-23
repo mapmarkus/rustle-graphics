@@ -8,7 +8,7 @@ mod draw;
 pub mod turtle;
 mod units;
 
-use canvas::{draw_turtle_head, draw_turtle_trails, get_context};
+use canvas::{draw_turtle_trails, get_context};
 use draw::Draw;
 use turtle::*;
 use units::Angle;
@@ -19,21 +19,16 @@ use units::Angle;
 pub fn start() -> Result<(), JsValue> {
     let context = get_context()?;
 
-    let mut turtle = Turtle {
-        head: Angle::new(0.0),
-        position: (250.0, 150.0),
-    };
-
     let red = Style {
         color: "red".to_string(),
         width: 2.0,
     };
-    let _blue = Style {
+    let blue = Style {
         color: "blue".to_string(),
         width: 2.0,
     };
 
-    draw_turtle_head(&turtle, &context);
+    // draw_turtle_head(&turtle, &context);
 
     // let _steps1 = vec![
     //     Step::PenDown(red.clone()),
@@ -92,6 +87,7 @@ pub fn start() -> Result<(), JsValue> {
     // ];
 
     let _steps3 = vec![
+        Step::Teleport((250.0, 200.0)),
         Step::PenDown(Style {
             color: "red".to_string(),
             width: 1.0,
@@ -122,6 +118,7 @@ pub fn start() -> Result<(), JsValue> {
     ];
 
     let _flower = vec![
+        Step::Teleport((250.0, 200.0)),
         Step::PenDown(red.clone()),
         Step::Repeat {
             count: 12,
@@ -140,10 +137,51 @@ pub fn start() -> Result<(), JsValue> {
         },
     ];
 
-    let trails: Vec<(Style, Draw<Path2d>)> = draw_turtle(&mut turtle, &_steps3);
+    let _intricate = vec![
+        Step::Teleport((250.0, 200.0)),
+        Step::Save,
+        Step::PenDown(red.clone()),
+        Step::Repeat {
+            count: 8,
+            step: Box::new(Step::Perform {
+                steps: vec![
+                    Step::Save,
+                    Step::Go(50.0),
+                    Step::Pivot {
+                        distance: 25.0,
+                        arc: Angle::half_turn().negate(),
+                    },
+                    Step::LookTo((250.0, 200.0)),
+                    Step::Go(25.0),
+                    Step::Restore,
+                    Step::Turn(Angle::new(PI / 4.0)),
+                ],
+            }),
+        },
+        Step::Restore,
+        Step::PenUp,
+        Step::Go(20.0),
+        Step::Turn(Angle::quarter_turn()),
+        Step::Go(-20.0),
+        Step::PenDown(blue.clone()),
+        Step::Repeat {
+            count: 4,
+            step: Box::new(Step::Perform {
+                steps: vec![
+                    Step::Pivot {
+                        distance: 20.0,
+                        arc: Angle::half_turn(),
+                    },
+                    Step::Turn(Angle::quarter_turn()),
+                ],
+            }),
+        },
+    ];
+
+    let trails: Vec<Trail<Draw<Path2d>>> = draw_turtle(&_intricate);
 
     draw_turtle_trails(&trails, &context);
-    draw_turtle_head(&turtle, &context);
+    // draw_turtle_head(&turtle, &context);
 
     Ok(())
 }
