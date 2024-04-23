@@ -9,6 +9,8 @@ pub struct Style {
 
 #[derive(Clone, Debug)]
 pub enum Step {
+    Teleport(Pt),
+    LookTo(Pt),
     Go(Distance),
     Turn(Angle),
     PenDown(Style),
@@ -36,6 +38,10 @@ impl Turtle {
         );
     }
 
+    fn look_to(&mut self, pt: Pt) {
+        self.head = Angle::new(f64::atan2(pt.1 - self.position.1, pt.0 - self.position.1));
+    }
+
     fn teleport(&mut self, pt: Pt) {
         self.position = pt;
     }
@@ -60,13 +66,21 @@ fn draw_turtle_in_drawable<T: Drawable + Default>(
 ) {
     for step in steps {
         match step {
+            Step::Teleport(pt) => {
+                turtle.teleport(*pt);
+                if let Some(ref mut p) = path {
+                    p.1.move_to(pt.0, pt.1);
+                }
+            }
+            Step::LookTo(pt) => {
+                turtle.look_to(*pt);
+            }
             Step::PenDown(s) => {
                 if path.is_some() {
                     let cp = path.take().unwrap();
                     trails.push(cp);
                 }
-                let mut new_p = T::default();
-                new_p.move_to(turtle.position.0, turtle.position.1);
+                let new_p = T::default();
                 *path = Some((s.clone(), new_p));
             }
             Step::Go(d) => {

@@ -2,6 +2,9 @@
 
 Project to learn Rust through implementing a simple Turtle Graphics engine.
 
+> **NOTE**
+> This is toy project that I'm using to learn rust.
+
 References:
 - [Turtle Graphics](https://en.wikipedia.org/wiki/Turtle_graphics)
 
@@ -15,17 +18,13 @@ Canvas docs:
 - [RenderingContext](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 - [Path2D](https://developer.mozilla.org/en-US/docs/Web/API/Path2D)
 
+Other:
+- [Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021)
+
 ## Build
 
 ```
-wasm-pack build --target web
-```
-
-NOTE: `wasm-pack` is a shortcut for some commands. It would do something like:
-
-```
-cargo build --target wasm32-unknown-unknown
-wasm-bindgen target/wasm32-unknown-unknown/debug/turtle.wasm --out-dir pkg --web
+. scripts/compile-canvas.sh
 ```
 
 ## Running examples
