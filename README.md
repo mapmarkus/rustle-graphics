@@ -24,7 +24,7 @@ Other:
 ## Build
 
 ```
-. scripts/compile-canvas.sh
+. scripts/compile-flower-canvas.sh
 ```
 
 ## Running examples

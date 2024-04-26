@@ -7,4 +7,5 @@
 # wasm-bindgen target/wasm32-unknown-unknown/debug/turtle.wasm --out-dir pkg --web
 # ```
 
-wasm-pack build --target web
+cd examples/flower-canvas && wasm-pack build --target web
+cd - > /dev/null 2>&1

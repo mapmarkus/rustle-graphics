@@ -2,13 +2,9 @@ use std::f64::consts::PI;
 
 use wasm_bindgen::prelude::*;
 
-mod canvas;
-pub mod turtle;
-mod units;
-
-use canvas::{draw_turtle_head, draw_turtle_trails, get_context};
-use turtle::*;
-use units::Angle;
+use render::canvas::{draw_turtle_head, draw_turtle_trails, get_context};
+use turtle::turtle::*;
+use turtle::units::Angle;
 
 // WASM STUFF
 

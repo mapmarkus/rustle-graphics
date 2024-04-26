@@ -1,9 +1,8 @@
 use wasm_bindgen::prelude::{JsCast, JsValue};
 use web_sys::{console, CanvasRenderingContext2d, Path2d};
 
-// use crate::units::Angle;
-use crate::turtle::{PathIns, Trail, TurtleState};
-use crate::units::Angle;
+use turtle::turtle::{PathIns, Trail, TurtleState};
+use turtle::units::Angle;
 
 pub fn get_context() -> Result<CanvasRenderingContext2d, JsValue> {
     let window = web_sys::window().expect("no global `window` exists");
