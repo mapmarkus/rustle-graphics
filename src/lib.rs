@@ -1,15 +1,12 @@
 use std::f64::consts::PI;
 
 use wasm_bindgen::prelude::*;
-use web_sys::Path2d;
 
 mod canvas;
-mod draw;
 pub mod turtle;
 mod units;
 
-use canvas::{draw_turtle_trails, get_context};
-use draw::Draw;
+use canvas::{draw_turtle_head, draw_turtle_trails, get_context};
 use turtle::*;
 use units::Angle;
 
@@ -92,29 +89,29 @@ pub fn start() -> Result<(), JsValue> {
             color: "red".to_string(),
             width: 1.0,
         }),
-        Step::Repeat {
-            count: 4,
-            step: Box::new(Step::Perform {
-                steps: vec![
-                    Step::Pivot {
-                        distance: 20.0,
-                        arc: Angle::new(PI / 3.0),
-                    },
-                    Step::Pivot {
-                        distance: 20.0,
-                        arc: Angle::new(-PI / 3.0),
-                    },
-                    Step::Pivot {
-                        distance: 20.0,
-                        arc: Angle::new(PI / 2.0),
-                    },
-                    Step::Pivot {
-                        distance: 20.0,
-                        arc: Angle::new(-PI),
-                    },
-                ],
-            }),
-        },
+        Step::Go(100.0), // Step::Repeat {
+                         //     count: 4,
+                         //     step: Box::new(Step::Perform {
+                         //         steps: vec![
+                         //             Step::Pivot {
+                         //                 distance: 20.0,
+                         //                 arc: Angle::new(PI / 3.0),
+                         //             },
+                         //             Step::Pivot {
+                         //                 distance: 20.0,
+                         //                 arc: Angle::new(-PI / 3.0),
+                         //             },
+                         //             Step::Pivot {
+                         //                 distance: 20.0,
+                         //                 arc: Angle::new(PI / 2.0),
+                         //             },
+                         //             Step::Pivot {
+                         //                 distance: 20.0,
+                         //                 arc: Angle::new(-PI),
+                         //             },
+                         //         ],
+                         //     }),
+                         // },
     ];
 
     let _flower = vec![
@@ -178,10 +175,11 @@ pub fn start() -> Result<(), JsValue> {
         },
     ];
 
-    let trails: Vec<Trail<Draw<Path2d>>> = draw_turtle(&_intricate);
-
-    draw_turtle_trails(&trails, &context);
-    // draw_turtle_head(&turtle, &context);
+    let mut turtle = TurtleState::new(Angle::zero(), (250.0, 200.0));
+    draw_turtle_head(&turtle, &context);
+    turtle.journey(&_intricate);
+    draw_turtle_trails(&turtle, &context);
+    draw_turtle_head(&turtle, &context);
 
     Ok(())
 }

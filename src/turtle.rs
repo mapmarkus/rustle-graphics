@@ -1,6 +1,5 @@
-use std::mem;
+use std::slice::Iter;
 
-use crate::draw::*;
 use crate::units::*;
 
 #[derive(Clone, Debug)]
@@ -34,45 +33,122 @@ pub enum Step {
 }
 
 #[derive(Clone, Debug)]
-pub struct Trail<T> {
+pub struct Trail {
     pub style: Style,
-    pub trail: T,
+    pub path: Vec<PathIns>,
 }
 
 #[derive(Clone, Debug)]
-struct TurtleState<T> {
+pub enum PathIns {
+    MoveTo {
+        x: f64,
+        y: f64,
+    },
+    LineTo {
+        x: f64,
+        y: f64,
+    },
+    Arc {
+        center_x: f64,
+        center_y: f64,
+        radius: f64,
+        start_angle: f64,
+        end_angle: f64,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub struct TurtleState {
     heading: Angle,
     position: Pt,
     saved: Vec<(Angle, Pt)>,
-    style: Style,
-    trail: T,
-    journey: Vec<Trail<T>>,
+    journey: Vec<Trail>,
     is_drawing: bool,
 }
 
-impl<T: Default> Default for TurtleState<T> {
+impl Default for TurtleState {
     fn default() -> Self {
         TurtleState {
             heading: Angle::zero(),
             position: (0.0, 0.0),
             saved: vec![],
-            style: Style::default(),
-            trail: T::default(),
             journey: vec![],
             is_drawing: false,
         }
     }
 }
 
-impl<T: Default> TurtleState<T> {
+impl<'a> TurtleState {
+    pub fn new(heading: Angle, position: Pt) -> Self {
+        let mut turtle_state = TurtleState::default();
+        turtle_state.heading = heading;
+        turtle_state.position = position;
+        turtle_state
+    }
+
+    pub fn heading(&self) -> Angle {
+        self.heading
+    }
+
+    pub fn position(&self) -> Pt {
+        self.position
+    }
+
+    fn move_to(&mut self, x: Units, y: Units) {
+        if let Some(trail) = self.journey.last_mut() {
+            trail.path.push(PathIns::MoveTo { x, y });
+        }
+    }
+
+    fn line_to(&mut self, x: Units, y: Units) {
+        if let Some(trail) = self.trail() {
+            trail.path.push(PathIns::LineTo { x, y })
+        }
+    }
+
+    fn arc(
+        &mut self,
+        center_x: Units,
+        center_y: Units,
+        radius: Distance,
+        start_angle: Angle,
+        end_angle: Angle,
+    ) {
+        if let Some(trail) = self.trail() {
+            trail.path.push(PathIns::Arc {
+                center_x,
+                center_y,
+                radius,
+                start_angle: start_angle.value(),
+                end_angle: end_angle.value(),
+            });
+        }
+    }
+
+    fn trail(&mut self) -> Option<&mut Trail> {
+        if self.is_drawing {
+            self.journey.last_mut()
+        } else {
+            None
+        }
+    }
+
+    pub fn iter(&'a self) -> Iter<'a, Trail> {
+        self.journey.iter()
+    }
+
+    pub fn journey(&mut self, steps: &[Step]) {
+        draw_turtle_in_drawable(self, steps);
+    }
+
     fn turn(&mut self, theta: Angle) {
         self.heading = self.heading.add(theta);
     }
 
     fn go(&mut self, d: Distance) {
         self.position = (
-            self.position.0 + d * self.heading.cos(),
-            self.position.1 + d * self.heading.sin(),
+            self.position.0 + self.heading.cos_r(d),
+            self.position.1 + self.heading.sin_r(d),
         );
     }
 
@@ -85,11 +161,9 @@ impl<T: Default> TurtleState<T> {
     }
 
     fn being_trail(&mut self, s: Style) {
-        let old_style = mem::replace(&mut self.style, s);
-        let old_trail = mem::replace(&mut self.trail, T::default());
         self.journey.push(Trail {
-            style: old_style,
-            trail: old_trail,
+            style: s,
+            path: vec![],
         });
     }
 
@@ -105,103 +179,78 @@ impl<T: Default> TurtleState<T> {
     }
 }
 
-pub fn draw_turtle<T: Drawable + Default>(steps: &[Step]) -> Vec<Trail<T>> {
-    let mut turtle_state: TurtleState<T> = TurtleState::default();
-    draw_turtle_in_drawable(&mut turtle_state, steps);
-    let mut journey = turtle_state.journey;
-    journey.push(Trail {
-        style: turtle_state.style,
-        trail: turtle_state.trail,
-    });
-    return journey;
-}
-
-fn draw_turtle_in_drawable<T: Drawable + Default>(turtle: &mut TurtleState<T>, steps: &[Step]) {
+fn draw_turtle_in_drawable(turtle: &mut TurtleState, steps: &[Step]) {
     for step in steps {
         match step {
             Step::Teleport(pt) => {
                 turtle.teleport(*pt);
-                turtle.trail.move_to(pt.0, pt.1);
+                turtle.move_to(turtle.position.0, turtle.position.1);
             }
+
             Step::LookTo(pt) => {
                 turtle.look_to(*pt);
             }
+
             Step::PenDown(s) => {
-                if turtle.is_drawing {
-                    turtle.being_trail(s.clone());
-                } else {
-                    turtle.style = s.clone();
-                    turtle.is_drawing = true;
-                }
+                turtle.being_trail(s.clone());
+                turtle.move_to(turtle.position.0, turtle.position.1);
+                turtle.is_drawing = true;
             }
+
             Step::PenUp => {
-                if turtle.is_drawing {
-                    turtle.being_trail(Style::default());
-                    turtle.is_drawing = false;
-                }
+                turtle.is_drawing = false;
             }
+
             Step::Save => {
                 turtle.save();
             }
+
             Step::Restore => {
                 turtle.restore();
-                if turtle.is_drawing {
-                    turtle.trail.move_to(turtle.position.0, turtle.position.1);
-                }
+                turtle.move_to(turtle.position.0, turtle.position.1);
             }
+
             Step::Go(d) => {
                 turtle.go(*d);
-                if turtle.is_drawing {
-                    turtle.trail.line_to(turtle.position.0, turtle.position.1);
-                }
+                turtle.line_to(turtle.position.0, turtle.position.1);
             }
+
             Step::Turn(theta) => {
                 turtle.turn(*theta);
             }
+
             Step::Pivot { distance, arc } => {
-                if turtle.is_drawing {
-                    // Subtracting or adding PI/2 is necessary to account for the fact that we want the turtle to be tangent to the "pivot arc"
-                    // If we don't do it, the turtle will be facing outward (normal) to the pivot circle, and that would not achieve
-                    // the smooth effect of a turtle pivoting around a point.
-                    let tangent = if arc.value() > 0.0 {
-                        turtle.heading.subtract(Angle::quarter_turn())
-                    } else {
-                        turtle.heading.add(Angle::quarter_turn())
-                    };
+                // Subtracting or adding PI/2 is necessary to account for the fact that we want the turtle to be tangent to the "pivot arc"
+                // If we don't do it, the turtle will be facing outward (normal) to the pivot circle, and that would not achieve
+                // the smooth effect of a turtle pivoting around a point.
+                let tangent = if arc.value() > 0.0 {
+                    turtle.heading.subtract(Angle::quarter_turn())
+                } else {
+                    turtle.heading.add(Angle::quarter_turn())
+                };
 
-                    let dest_angle = tangent.add(*arc);
-                    let pivot_x = turtle.position.0 - tangent.cos_r(*distance);
-                    let pivot_y = turtle.position.1 - tangent.sin_r(*distance);
-                    let x = pivot_x + dest_angle.cos_r(*distance);
-                    let y = pivot_y + dest_angle.sin_r(*distance);
+                let dest_angle = tangent.add(*arc);
+                let pivot_x = turtle.position.0 - tangent.cos_r(*distance);
+                let pivot_y = turtle.position.1 - tangent.sin_r(*distance);
+                let x = pivot_x + dest_angle.cos_r(*distance);
+                let y = pivot_y + dest_angle.sin_r(*distance);
 
-                    if arc.value() > 0.0 {
-                        turtle.trail.arc(
-                            pivot_x,
-                            pivot_y,
-                            *distance,
-                            tangent.value(),
-                            tangent.add(*arc).value(),
-                        )
-                    } else {
-                        turtle.trail.move_to(x, y);
-                        turtle.trail.arc(
-                            pivot_x,
-                            pivot_y,
-                            *distance,
-                            dest_angle.value(),
-                            tangent.value(),
-                        );
-                        turtle.trail.move_to(x, y);
-                    }
-
-                    turtle.turn(*arc);
-                    turtle.teleport((x, y));
+                if arc.value() > 0.0 {
+                    turtle.arc(pivot_x, pivot_y, *distance, tangent, tangent.add(*arc))
+                } else {
+                    turtle.move_to(x, y);
+                    turtle.arc(pivot_x, pivot_y, *distance, dest_angle, tangent);
+                    turtle.move_to(x, y);
                 }
+
+                turtle.turn(*arc);
+                turtle.teleport((x, y));
             }
+
             Step::Perform { steps } => {
                 draw_turtle_in_drawable(turtle, steps);
             }
+
             Step::Repeat { count, step } => {
                 let unboxed_step = (*step).as_ref();
                 for _ in 0..*count {
