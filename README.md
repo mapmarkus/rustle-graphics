@@ -1,25 +1,11 @@
 # Turtle Graphics in Rust
 
+Experimental project to implement Turtle graphics in Rust.
+
+I started this project just to learn Rust basics, but I may evolve it into
+something else in the future.
+
 Project to learn Rust through implementing a simple Turtle Graphics engine.
-
-> **NOTE**
-> This is toy project that I'm using to learn rust.
-
-References:
-- [Turtle Graphics](https://en.wikipedia.org/wiki/Turtle_graphics)
-
-Rust docs:
-- [Rust Book](https://doc.rust-lang.org/book/)
-- [Rust by Example](https://doc.rust-lang.org/rust-by-example/index.html)
-- [Carbo Book](https://doc.rust-lang.org/cargo/index.html)
-- [WASM pack](https://rustwasm.github.io/docs/wasm-pack/)
-
-Canvas docs:
-- [RenderingContext](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
-- [Path2D](https://developer.mozilla.org/en-US/docs/Web/API/Path2D)
-
-Other:
-- [Rust Playground](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021)
 
 ## Build
 
