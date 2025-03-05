@@ -80,10 +80,11 @@ impl Default for TurtleState {
 
 impl<'a> TurtleState {
     pub fn new(heading: Angle, position: Pt) -> Self {
-        let mut turtle_state = TurtleState::default();
-        turtle_state.heading = heading;
-        turtle_state.position = position;
-        turtle_state
+        Self {
+            heading,
+            position,
+            ..Default::default()
+        }
     }
 
     pub fn heading(&self) -> Angle {

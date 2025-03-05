@@ -79,56 +79,56 @@ pub fn start() -> Result<(), JsValue> {
     //     Step::Go(100.0),
     // ];
 
-    let _steps3 = vec![
-        Step::Teleport((250.0, 200.0)),
-        Step::PenDown(Style {
-            color: "red".to_string(),
-            width: 1.0,
-        }),
-        Step::Go(100.0), // Step::Repeat {
-                         //     count: 4,
-                         //     step: Box::new(Step::Perform {
-                         //         steps: vec![
-                         //             Step::Pivot {
-                         //                 distance: 20.0,
-                         //                 arc: Angle::new(PI / 3.0),
-                         //             },
-                         //             Step::Pivot {
-                         //                 distance: 20.0,
-                         //                 arc: Angle::new(-PI / 3.0),
-                         //             },
-                         //             Step::Pivot {
-                         //                 distance: 20.0,
-                         //                 arc: Angle::new(PI / 2.0),
-                         //             },
-                         //             Step::Pivot {
-                         //                 distance: 20.0,
-                         //                 arc: Angle::new(-PI),
-                         //             },
-                         //         ],
-                         //     }),
-                         // },
-    ];
+    //let _steps3 = vec![
+    //    Step::Teleport((250.0, 200.0)),
+    //    Step::PenDown(Style {
+    //        color: "red".to_string(),
+    //        width: 1.0,
+    //    }),
+    //    Step::Go(100.0), // Step::Repeat {
+    //                     //     count: 4,
+    //                     //     step: Box::new(Step::Perform {
+    //                     //         steps: vec![
+    //                     //             Step::Pivot {
+    //                     //                 distance: 20.0,
+    //                     //                 arc: Angle::new(PI / 3.0),
+    //                     //             },
+    //                     //             Step::Pivot {
+    //                     //                 distance: 20.0,
+    //                     //                 arc: Angle::new(-PI / 3.0),
+    //                     //             },
+    //                     //             Step::Pivot {
+    //                     //                 distance: 20.0,
+    //                     //                 arc: Angle::new(PI / 2.0),
+    //                     //             },
+    //                     //             Step::Pivot {
+    //                     //                 distance: 20.0,
+    //                     //                 arc: Angle::new(-PI),
+    //                     //             },
+    //                     //         ],
+    //                     //     }),
+    //                     // },
+    //];
 
-    let _flower = vec![
-        Step::Teleport((250.0, 200.0)),
-        Step::PenDown(red.clone()),
-        Step::Repeat {
-            count: 12,
-            step: Box::new(Step::Perform {
-                steps: vec![
-                    Step::Go(20.0),
-                    Step::Turn(Angle::new(PI / 3.0)),
-                    Step::Repeat {
-                        count: 9,
-                        step: Box::new(Step::Perform {
-                            steps: vec![Step::Go(20.0), Step::Turn(Angle::new(PI / 6.0))],
-                        }),
-                    },
-                ],
-            }),
-        },
-    ];
+    //let _flower = vec![
+    //    Step::Teleport((250.0, 200.0)),
+    //    Step::PenDown(red.clone()),
+    //    Step::Repeat {
+    //        count: 12,
+    //        step: Box::new(Step::Perform {
+    //            steps: vec![
+    //                Step::Go(20.0),
+    //                Step::Turn(Angle::new(PI / 3.0)),
+    //                Step::Repeat {
+    //                    count: 9,
+    //                    step: Box::new(Step::Perform {
+    //                        steps: vec![Step::Go(20.0), Step::Turn(Angle::new(PI / 6.0))],
+    //                    }),
+    //                },
+    //            ],
+    //        }),
+    //    },
+    //];
 
     let _intricate = vec![
         Step::Teleport((250.0, 200.0)),
